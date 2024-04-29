@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
-@TableName("user")
+@TableName("users")
 public class User {
     @TableId(type = IdType.AUTO)
     private Integer id;
     private String username;
     private String password;
+    private Integer roleId;
 }

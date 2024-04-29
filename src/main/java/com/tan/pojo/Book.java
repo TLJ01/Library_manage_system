@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("book")
+@TableName("books")
 public class Book {
 
     @TableId(type = IdType.AUTO)
@@ -27,10 +27,10 @@ public class Book {
 
     private String author;
 
-    private LocalDateTime updateTime;
+    private String category;
 
-    private double price;
+    private Integer status; // 0表示可借，1表示已借出，等等
 
-    private Integer stock;
+    private Integer isDeleted; // 0表示未删除，1表示已删除
 
 }
