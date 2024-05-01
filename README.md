@@ -5,14 +5,37 @@
 ## 板块
 
 ### 1.登录注册
+#### 注册
+注册时给出用户名密码以及角色(管理员/普通用户)  
+
+判断当前用户是否存在  
+
+注册到数据库的密码进行了md5加密
+
+#### 登录
+判断当前用户是否存在  
+
+存在就生成jwt返回给前端  
+
+同时将jwt作为key,用户信息作为value存入redis
 
 ### 2.书籍管理
 
+实现基本的CRUD(增删改查) 
+
+同时做了分页查询以及根据书籍名的模糊查询  
+
+做了角色权限  
+管理员可以对书籍增删改查
+普通用户只能查看书籍以及借书
+
 ### 3.用户管理
 
-### 4.借阅记录
+管理员/普通用户
 
-### 5.日志记录
+### 4.借阅记录
+借书  
+还书  
 
 ## 数据库设计
 ### 1.书籍表(books)
@@ -50,12 +73,12 @@
 
 ## 创表语句
 ```mysql
-角色
+# 角色
 CREATE TABLE roles (
                        id INT AUTO_INCREMENT PRIMARY KEY,
                        name VARCHAR(50) NOT NULL
 );
-用户
+# 用户
 CREATE TABLE users (
                        id INT AUTO_INCREMENT PRIMARY KEY,
                        username VARCHAR(50) NOT NULL UNIQUE,
@@ -63,7 +86,7 @@ CREATE TABLE users (
                        role_id INT,
                        FOREIGN KEY (role_id) REFERENCES roles(id)
 );
-书籍
+# 书籍
 CREATE TABLE books (
                        id INT AUTO_INCREMENT PRIMARY KEY,
                        title VARCHAR(255) NOT NULL,
@@ -72,7 +95,7 @@ CREATE TABLE books (
                        status INT NOT NULL, -- 0表示可借，1表示已借出，等等
                        is_deleted INT DEFAULT 0 -- 0表示未删除，1表示已删除
 );
-借阅表
+# 借阅表
 CREATE TABLE borrow_records (
                                 id INT AUTO_INCREMENT PRIMARY KEY,
                                 book_id INT,
@@ -89,7 +112,7 @@ CREATE TABLE borrow_records (
 
 ## API
 
-#### Book
+### Book
 
 `/books/{id}`
 
@@ -101,3 +124,81 @@ CREATE TABLE borrow_records (
 |  body  |                  | `{"message": "OK"}` |
 
 > 根据id删除书籍
+>
+| `DELETE`  |       发送       |        回复         |
+| :----: | :--------------: | :-----------------: |
+| header | `token：jwt令牌` |                     |
+|  body  |                  | `{"message": "OK"}` |
+
+`/books/list`
+> 分页查询
+
+| `GET`  |                  发送                   |        回复         |
+|:------:|:-------------------------------------:| :-----------------: |
+| header |             `token：jwt令牌`             |                     |
+|  body  | 查询参数`currentPage=当前页`,`pageSize=每页大小` | `{"message": "OK"}` |
+
+`/books`
+> 根据书籍名字进行模糊查询
+
+| `GET`  |         发送         |        回复         |
+|:------:|:------------------:| :-----------------: |
+| header |   `token：jwt令牌`    |                     |
+|  body  | 查询参数`bookName=书籍名` | `{"message": "OK"}` |
+
+`/books/insert`
+
+> 新增书籍
+
+| `POST` |                          发送                           |        回复         |
+|:------:|:-----------------------------------------------------:| :-----------------: |
+| header |                     `token：jwt令牌`                     |                     |
+|  body  | json`{"bookName":"书名","author":"作者","category":"类型"}` | `{"message": "OK"}` |
+
+`/books/update`
+
+> 更新书籍
+
+| `PUT`  |                              发送                              |        回复         |
+|:------:|:------------------------------------------------------------:| :-----------------: |
+| header |                        `token：jwt令牌`                         |                     |
+|  body  | json`{"id":id,"category":"类型","bookName":"书名","author:"作者"}` | `{"message": "OK"}` |
+
+
+### User
+
+`/users/register`
+> 注册
+
+| `POST` |                  发送                  |        回复         |
+|:------:|:------------------------------------:| :-----------------: |
+| header |            `token：jwt令牌`             |                     |
+|  body  | 查询参数`username=?,password=?,roleId=?` | `{"message": "OK"}` |
+
+`/users/register`
+> 登录
+
+| `POST` |                    发送                    |        回复         |
+|:------:|:----------------------------------------:| :-----------------: |
+| header |              `token：jwt令牌`               |                     |
+|  body  | json`{"username":"用户名","password":"密码"}` | `{"message": "OK"}` |
+
+
+### BorrowRecord
+
+`/borrow`
+> 借书
+
+
+| `POST` |         发送         |        回复         |
+|:------:|:------------------:| :-----------------: |
+| header |   `token：jwt令牌`    |                     |
+|  body  | 查询参数 `bookId=书籍id` | `{"message": "OK"}` |
+
+`/return`
+> 还书
+
+| `POST` |          发送          |        回复         |
+|:------:|:--------------------:| :-----------------: |
+| header |    `token：jwt令牌`     |                     |
+|  body  | 查询参数 `recordId=借阅id` | `{"message": "OK"}` |
