@@ -1,13 +1,14 @@
 package com.tan.controller;
 
-import com.tan.dto.DtoSaveBook;
-import com.tan.mapper.MapperBook;
 import com.tan.pojo.Book;
 import com.tan.pojo.PageBean;
 import com.tan.pojo.Result;
 import com.tan.service.ServiceBook;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,11 +22,13 @@ import java.util.List;
 @RequestMapping("/books")
 public class ControllerBook {
 
-    @Autowired
-    private MapperBook bookMapper;
 
     @Autowired
     private ServiceBook serviceBook;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
 
     /**
      * 根据id查询书籍
@@ -34,8 +37,11 @@ public class ControllerBook {
      */
     @GetMapping("/{id}")
     public Result findById(@PathVariable Integer id){
-        return Result.success(bookMapper.selectById(id));
+        Book book = serviceBook.selectById(id);
+        if(book == null){return Result.error("该书籍不存在");}
+        else return Result.success(book);
     }
+
 
     /**
      * 分页查询
@@ -44,7 +50,7 @@ public class ControllerBook {
      * @return
      */
     @GetMapping("/list")
-    public Result page(Integer currentPage, Integer pageSize){
+    public Result page(@RequestParam(defaultValue = "1") Integer currentPage,@RequestParam(defaultValue = "5") Integer pageSize){
        PageBean pageBean = serviceBook.findByPage(currentPage,pageSize);
        return Result.success(pageBean);
     }
@@ -55,41 +61,47 @@ public class ControllerBook {
      * @return
      */
     @GetMapping
-    public List<Book> findBooksByName(@RequestParam String bookName) {
-        return serviceBook.findByName(bookName);
+    public Result findBooksByName(@RequestParam String bookName) {
+        List<Book> books = serviceBook.findByName(bookName);
+        log.info("书籍信息:{}",books);
+        return Result.success(books);
     }
 
     /**
      * 插入书籍
-     * @param dtoSaveBook
+     * 管理员权限
+     * @param book
      * @return
      */
     @PostMapping("/insert")
-    public Result save(@RequestBody DtoSaveBook dtoSaveBook){
-        serviceBook.insert(dtoSaveBook);
-        return Result.success();
+    public Result save(@RequestBody Book book, HttpServletRequest request) throws Exception {
+        if (serviceBook.insert(book,request))return Result.success();
+        else return Result.error("您没有操作权限");
     }
 
     /**
      * 根据id删除书籍
+     * 管理员权限
      * @param id
      * @return
      */
-    @DeleteMapping("/{id}")
-    public Result deleteById(@PathVariable Integer id){
-        bookMapper.deleteById(id);
-        return Result.success();
+    @DeleteMapping("/delete/{id}")
+    public Result deleteById(@PathVariable Integer id, HttpServletRequest request) throws Exception {
+        log.info("id:{}",id);
+        if(serviceBook.deleteById(id,request))return Result.success();
+        else return Result.error("您没有操作权限");
     }
 
     /**
      * 更新书籍
+     * 管理员权限
      * @param book
      * @return
      */
     @PutMapping("/update")
-    public Result update(@RequestBody Book book){
-        serviceBook.update(book);
-        return Result.success();
+    public Result update(@RequestBody Book book, HttpServletRequest request) throws Exception {
+        if(serviceBook.update(book,request))return Result.success();
+        else return Result.error("您没有操作权限");
     }
 
 }

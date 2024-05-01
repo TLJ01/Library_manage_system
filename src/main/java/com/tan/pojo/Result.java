@@ -14,14 +14,14 @@ public class Result {
 
     //增删改 成功响应
     public static Result success(){
-        return new Result(1,"success",null);
+        return new Result(200,"success",null);
     }
     //查询 成功响应
     public static Result success(Object data){
-        return new Result(1,"success",data);
+        return new Result(200,"success",data);
     }
     //失败响应
     public static Result error(String msg){
-        return new Result(0,msg,null);
+        return new Result(201,msg,null);
     }
 }

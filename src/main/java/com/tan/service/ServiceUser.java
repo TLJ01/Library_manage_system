@@ -1,6 +1,9 @@
 package com.tan.service;
 
+import com.tan.pojo.Result;
 import com.tan.pojo.User;
+
+import java.util.Map;
 
 public interface ServiceUser {
     /**
@@ -9,14 +12,7 @@ public interface ServiceUser {
      * @param user
      * @return
      */
-    User login(User user);
-
-    /**
-     * 查询该用户是否存在
-     * @param username
-     * @return
-     */
-    User check(String username);
+    Result login(User user);
 
 
     /**
@@ -24,5 +20,12 @@ public interface ServiceUser {
      * @param username
      * @param password
      */
-    void register(String username, String password);
+    void register(String username, String password,Integer roleId);
+
+    /**
+     * 判断注册时用户名是否存在
+     * @param username
+     * @return
+     */
+    Boolean isExist(String username);
 }

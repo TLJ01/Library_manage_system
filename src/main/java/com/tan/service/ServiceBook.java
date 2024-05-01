@@ -1,8 +1,8 @@
 package com.tan.service;
 
-import com.tan.dto.DtoSaveBook;
 import com.tan.pojo.Book;
 import com.tan.pojo.PageBean;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
@@ -25,13 +25,26 @@ public interface ServiceBook {
 
     /**
      * 新增书籍
-     * @param dtoSaveBook
+     * @param book
      */
-    void insert(DtoSaveBook dtoSaveBook);
+    Boolean insert(Book book, HttpServletRequest request) throws Exception;
 
     /**
      * 更新书籍
      * @param book
      */
-    void update(Book book);
+    Boolean update(Book book, HttpServletRequest request) throws Exception;
+
+    /**
+     * 根据id查询书籍
+     * @param id
+     * @return
+     */
+    Book selectById(Integer id);
+
+    /**
+     * 根据id删除书籍
+     * @param id
+     */
+    Boolean deleteById(Integer id, HttpServletRequest request) throws Exception;
 }

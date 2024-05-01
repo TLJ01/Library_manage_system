@@ -29,8 +29,8 @@ public class Book {
 
     private String category;
 
-    private Integer status; // 0表示可借，1表示已借出，等等
+    private Integer status; // 1表示可借，0表示已借出，等等
 
-    private Integer isDeleted; // 0表示未删除，1表示已删除
+    private Integer isDeleted; // 1表示未删除，0表示已删除
 
 }

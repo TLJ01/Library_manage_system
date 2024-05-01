@@ -20,5 +20,9 @@ public class User {
     private Integer id;
     private String username;
     private String password;
+    /**
+     * 1代表管理员
+     * 2代表普通用户
+     */
     private Integer roleId;
 }
